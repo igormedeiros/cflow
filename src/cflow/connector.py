@@ -2,6 +2,7 @@
 
 import pandas as pd
 import requests
+from logger import log
 
 class ConnectorBase:
     def __init__(self, name, description=None):
@@ -9,4 +10,4 @@ class ConnectorBase:
         self.description = description
 
     def connect(self):
-        print(f"Connecting using: {self.name}")
+        log.info(f"Connecting using: {self.name}")

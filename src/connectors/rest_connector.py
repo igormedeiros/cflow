@@ -1,4 +1,7 @@
 # Conector específico: RestConnector
+from cflow.connector import ConnectorBase
+from logger import log
+
 class RestConnector(ConnectorBase):
     def __init__(self, name, description=None, base_url=None, endpoint=None, headers=None):
         super().__init__(name, description if description else "Sends POST requests to a REST API")
@@ -8,9 +11,9 @@ class RestConnector(ConnectorBase):
         self.headers = headers if headers else {}
 
     def connect(self):
-        print(f"Ready to make REST requests to: {self.url}")
+        log.info(f"Ready to make REST requests to: {self.url}")
 
     def post(self, payload):
         response = requests.post(self.url, json=payload, headers=self.headers)
-        print(f"POST to {self.url} with payload {payload} - Status Code: {response.status_code}")
+        log.info(f"POST to {self.url} with payload {payload} - Status Code: {response.status_code}")
         return response

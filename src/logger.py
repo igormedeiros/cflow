@@ -13,17 +13,17 @@ LOG_CONFIG = {
     'FORMAT': '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
 }
 
+
 def setup_logger():
     # Criar diretório de logs se não existir
     if not os.path.exists(LOG_CONFIG['LOG_DIRECTORY']):
         os.makedirs(LOG_CONFIG['LOG_DIRECTORY'])
 
-    
     # Obter o nome da pasta raiz
     root_directory = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     # Configuração do logger
     logger = logging.getLogger(root_directory)
-    
+
     # Definir nível de log baseado na configuração ou variável de ambiente
     log_level = os.getenv('LOG_LEVEL', LOG_CONFIG['DEFAULT_LEVEL'])
     logger.setLevel(getattr(logging, log_level.upper()))
@@ -52,6 +52,7 @@ def setup_logger():
         logger.addHandler(file_handler)
 
     return logger
+
 
 # Criar instância única do logger
 log = setup_logger()

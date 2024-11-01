@@ -1,10 +1,15 @@
 # src/cflow/workflow.py
 
 class Workflow:
-    def __init__(self, name, description=None, tools=None, connectors=None):
+    def __init__(self,
+                 name,
+                 description=None,
+                 tools=None,
+                 connectors=None,
+                 tasks=None):
         self.name = name
         self.description = description
-        self.tasks = []
+        self.tasks = tasks if connectors else []
         self.connectors = connectors if connectors else []
         self.tools = tools if tools else []
 

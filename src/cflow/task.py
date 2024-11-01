@@ -14,7 +14,7 @@ class TaskBase:
         self.connectors.append(connector)
 
     def execute(self):
-        print(f"Executing task: {self.name}")
+        log.info(f"Executing task: {self.name}")
         for connector in self.connectors:
             connector.connect()
         for tool in self.tools:
