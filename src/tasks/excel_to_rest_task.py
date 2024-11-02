@@ -1,5 +1,5 @@
 # Task específica que lê de um Excel e faz POST via RestConnector
-from cflow.task import TaskBase
+from cflow.task_base import TaskBase
 
 from logger import log
 

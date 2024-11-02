@@ -1,29 +1,199 @@
-# src/cflow/workflow.py
+# File: src/cflow/workflow.py
+from typing import List, Optional
+import time
+from enum import Enum
+from logger import log
+from cflow.connector_base import ConnectorBase, NotifiableConnector
+from cflow.task_base import TaskBase
+from cflow.tool_base import ToolBase
+
+
+class WorkflowState(Enum):
+    READY = "Ready"
+    RUNNING = "Running"
+    PAUSED = "Paused"
+    COMPLETED = "Completed"
+    FAILED = "Failed"
+
 
 class Workflow:
     def __init__(self,
-                 name,
-                 description=None,
-                 tools=None,
-                 connectors=None,
-                 tasks=None):
+                 name: str,
+                 description: Optional[str] = None,
+                 tools: Optional[List[ToolBase]] = None,
+                 connectors: Optional[List[ConnectorBase]] = None,
+                 tasks: Optional[List[TaskBase]] = None):
+        """
+        Initializes a Workflow instance with the given name, description, tools, connectors, and tasks.
+
+        :param name: Name of the workflow.
+        :param description: Optional description of the workflow.
+        :param tools: List of tools to be used in the workflow.
+        :param connectors: List of connectors to be used in the workflow.
+        :param tasks: List of tasks to be executed as part of the workflow.
+        """
         self.name = name
-        self.description = description
-        self.tasks = tasks if connectors else []
-        self.connectors = connectors if connectors else []
-        self.tools = tools if tools else []
+        self.description = description if description else "No description provided."
+        self.tasks: List[TaskBase] = tasks if tasks else []
+        self.connectors: List[ConnectorBase] = connectors if connectors else []
+        self.tools: List[ToolBase] = tools if tools else []
+        self.state = WorkflowState.READY
+        self.metrics = {
+            "total_execution_time": 0,
+            "failed_tasks": 0,
+            "successful_tasks": 0,
+        }
 
-    def add_task(self, task):
+    def add_task(self, task: TaskBase):
+        """
+        Adds a task to the workflow.
+
+        :param task: The task to be added.
+        """
         self.tasks.append(task)
+        log.info(f"Task added: {task.name}")
 
-    def add_connector(self, connector):
+    def add_connector(self, connector: ConnectorBase):
+        """
+        Adds a connector to the workflow.
+
+        :param connector: The connector to be added.
+        """
         self.connectors.append(connector)
+        log.info(f"Connector added: {connector.name}")
 
-    def run(self):
+    def add_tool(self, tool: ToolBase):
+        """
+        Adds a tool to the workflow.
+
+        :param tool: The tool to be added.
+        """
+        self.tools.append(tool)
+        log.info(f"Tool added: {tool.name}")
+
+    def _connect_connectors(self):
+        """
+        Connect all connectors after validating their configuration.
+        """
         for connector in self.connectors:
-            connector.connect()
-        for task in self.tasks:
-            task.execute()
+            if not connector.validate():
+                log.error(f"Connector '{connector.name}' validation failed. Skipping connection.")
+                continue
         for connector in self.connectors:
-            if hasattr(connector, 'notify'):
+            attempt = 0
+            while attempt < 3:  # Retry mechanism
+                try:
+                    log.info(f"Attempting to connect: {connector.name}, Attempt: {attempt + 1}")
+                    connector.connect()
+                    break
+                except Exception as e:
+                    log.error(f"Connection attempt {attempt + 1} failed for {connector.name}: {e}")
+                    attempt += 1
+                    time.sleep(2 ** attempt)  # Exponential backoff
+            else:
+                log.error(f"Failed to connect to connector: {connector.name} after 3 attempts")
+                raise Exception(f"Connector '{connector.name}' could not be connected after multiple attempts.")
+
+    def _notify_connectors(self):
+        for connector in self.connectors:
+            if isinstance(connector, NotifiableConnector):
                 connector.notify()
+
+    def run(self, callback=None, tool_params: Optional[dict] = None):
+        """
+        Runs the workflow by connecting to all connectors, executing all tasks, and utilizing all tools.
+        Enhanced error handling to differentiate between different error scenarios.
+        """
+        try:
+            self.state = WorkflowState.RUNNING
+            log.info(f"Workflow '{self.name}' state updated to: {self.state.value}")
+            start_time = time.time()
+
+            # Connect all connectors with validation
+            try:
+                self._connect_connectors()
+            except Exception as ce:
+                self.state = WorkflowState.FAILED
+                log.error(f"Connection error in workflow '{self.name}': {ce}")
+                return
+
+            # Execute all tasks
+            for task in self.tasks:
+                try:
+                    log.info(f"Starting execution of task: {task.name}")
+                    start_task_time = time.time()
+                    if task.validate():
+                        task.execute()
+                        self.metrics["successful_tasks"] += 1
+                        log.info(f"Task '{task.name}' executed successfully.")
+                    else:
+                        log.warning(f"Task '{task.name}' validation failed. Skipping execution.")
+                    end_task_time = time.time()
+                    log.info(f"Task '{task.name}' completed in {end_task_time - start_task_time} seconds.")
+                except Exception as e:
+                    self.metrics["failed_tasks"] += 1
+                    log.error(f"Error while executing task '{task.name}': {e}")
+
+            # Execute all tools
+            for tool in self.tools:
+                try:
+                    log.info(f"Starting execution of tool: {tool.name}")
+                    start_tool_time = time.time()
+                    if tool.validate():
+                        params = tool_params.get(tool.name, {}) if tool_params else {}
+                        result = tool.run(**params)
+                        log.info(f"Tool '{tool.name}' executed with result: {result}")
+                    else:
+                        log.warning(f"Tool '{tool.name}' validation failed. Skipping execution.")
+                    end_tool_time = time.time()
+                    log.info(f"Tool '{tool.name}' completed in {end_tool_time - start_tool_time} seconds.")
+                except Exception as e:
+                    log.error(f"Error while executing tool '{tool.name}': {e}")
+
+            # Notify using connectors if applicable
+            self._notify_connectors()
+
+            # Update state and metrics
+            self.state = WorkflowState.COMPLETED
+            end_time = time.time()
+            self.metrics["total_execution_time"] = end_time - start_time
+            log.info(f"Workflow '{self.name}' completed in {self.metrics['total_execution_time']} seconds.")
+
+            # Callback if provided
+            if callback:
+                callback(self)
+
+        except Exception as e:
+            log.error(f"Unknown error in workflow '{self.name}': {e}")
+            self.state = WorkflowState.FAILED
+            log.error(f"Workflow '{self.name}' state updated to: {self.state.value} due to error: {e}")
+
+    def get_metrics(self):
+        """
+        Get the metrics of the workflow execution.
+
+        :return: A dictionary containing metrics such as total execution time, failed tasks, and successful tasks.
+        """
+        return self.metrics
+
+# Usage Example
+# --------------------------------------------------------
+# This is an example of how to use the Workflow class to create a new workflow.
+#
+# from connectors.telegram_connector import TelegramConnector
+# from tasks.excel_to_telegram_task import ExcelToTelegramTask
+# from tools.example_tool import ExampleTool
+#
+# workflow = Workflow(name="SampleWorkflow", description="A workflow that demonstrates connectors, tasks, and tools")
+#
+# telegram_connector = TelegramConnector(name="Telegram Connector", token="YOUR_TOKEN", chat_id="YOUR_CHAT_ID")
+# workflow.add_connector(telegram_connector)
+#
+# excel_task = ExcelToTelegramTask(name="Excel to Telegram Task", file_path="/path/to/excel.xlsx", connector=telegram_connector)
+# workflow.add_task(excel_task)
+#
+# example_tool = ExampleTool(name="Sample Tool")
+# workflow.add_tool(example_tool)
+#
+# workflow.run()
+# --------------------------------------------------------
