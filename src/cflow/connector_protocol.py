@@ -1,49 +1,57 @@
-# File: src/cflow/task_protocol.py
-from abc import ABC, abstractmethod
+from typing import Protocol, Dict, Any
 
-class TaskProtocol(ABC):
-    @abstractmethod
-    def execute(self) -> None:
+class ConnectorProtocol(Protocol):
+    def connect(self, **kwargs) -> None:
         """
-        Execute the task's main logic.
+        Establishes a connection to the desired endpoint.
+        :param kwargs: Additional parameters required for connection.
 
         Example:
-            task = MyCustomTask()
-            task.execute()
+        ```python
+        connector = MyConnector()
+        connector.connect(param1="value1", param2="value2")
+        ```
         """
-        pass
+        ...
 
-    @abstractmethod
-    def validate(self) -> bool:
+    def disconnect(self) -> None:
         """
-        Validate the task before execution.
-
-        :return: Boolean indicating if the task is valid.
-
-        Example:
-            task = MyCustomTask()
-            is_valid = task.validate()
-        """
-        pass
-
-    @abstractmethod
-    def pre_execute_hook(self) -> None:
-        """
-        Hook method to perform operations before task execution.
+        Disconnects from the connection.
 
         Example:
-            task = MyCustomTask()
-            task.pre_execute_hook()
+        ```python
+        connector = MyConnector()
+        connector.disconnect()
+        ```
         """
-        pass
+        ...
 
-    @abstractmethod
-    def post_execute_hook(self) -> None:
+    def validate_connection(self) -> bool:
         """
-        Hook method to perform operations after task execution.
+        Validates if the current connection is active and correct.
+        :return: Boolean indicating if the connection is valid.
 
         Example:
-            task = MyCustomTask()
-            task.post_execute_hook()
+        ```python
+        connector = MyConnector()
+        if connector.validate_connection():
+            print("Connection is valid")
+        else:
+            print("Connection is not valid")
+        ```
         """
-        pass
+        ...
+
+    def get_info(self) -> Dict[str, Any]:
+        """
+        Provides information about the connector.
+        :return: Dictionary containing information about the connector.
+
+        Example:
+        ```python
+        connector = MyConnector()
+        info = connector.get_info()
+        print(info)
+        ```
+        """
+        ...

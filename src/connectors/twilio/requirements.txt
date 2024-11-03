@@ -1,0 +1,2 @@
+# Requirements for Twilio Connector
+twilio==7.6.0

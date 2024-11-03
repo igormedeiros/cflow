@@ -1,0 +1,2 @@
+# Requirements for Registro.br Connector
+requests==2.28.1

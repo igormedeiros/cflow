@@ -1,0 +1,2 @@
+# Requirements for Microsoft Excel Online Connector
+requests==2.26.0

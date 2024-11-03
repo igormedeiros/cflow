@@ -1,0 +1,3 @@
+
+# Requirements for SAP Connector
+requests==2.26.0

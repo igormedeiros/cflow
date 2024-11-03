@@ -1,0 +1,3 @@
+
+# Requirements for MySQL Connector
+mysql-connector-python==8.0.31

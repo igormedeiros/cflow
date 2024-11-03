@@ -1,5 +1,5 @@
 import pkg_resources
-from logger import log
+from cflow.logger import log
 
 class ConnectorManager:
     def __init__(self):

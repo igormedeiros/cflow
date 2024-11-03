@@ -1,152 +1,136 @@
-# Arquivo: src/connectors/trello_connector/trello_connector.py
-
-from src.cflow.connector_base import ConnectorBase
-import requests
-from logger import log
+# File: trello_connector.py
 import os
+from typing import Optional, List, Dict, Any
+import requests
+from cflow.connector_base import ConnectorBase, NotifiableConnector
+from cflow.logger import log
 
 
-class TrelloConnector(ConnectorBase):
-    def __init__(self, name="TrelloConnector", description=None, retry_attempts=3, timeout=30, enable_retry=True):
+class TrelloConnector(ConnectorBase, NotifiableConnector):
+    def __init__(
+            self,
+            name: str = "TrelloConnector",
+            description: Optional[str] = None,
+            api_key: Optional[str] = None,
+            api_token: Optional[str] = None,
+            board_id: Optional[str] = None,
+            retry_attempts: int = 3,
+            timeout: int = 30,
+            enable_retry: bool = True
+    ):
         """
-        Initializes the TrelloConnector instance with specific parameters.
-
-        :param name: Name of the connector.
-        :param description: Optional description of the connector.
-        :param retry_attempts: Number of times to retry the connection in case of failure.
-        :param timeout: Timeout value for the connection.
-        :param enable_retry: Flag to enable or disable retry attempts.
+        Initializes the TrelloConnector instance.
         """
-        super().__init__(name, description if description else "Connects to Trello API", retry_attempts, timeout,
-                         enable_retry)
-        self.api_key = os.getenv('TRELLO_API_KEY')
-        self.token = os.getenv('TRELLO_TOKEN')
-        self.base_url = "https://api.trello.com/1/"
-        self.setup_connector()
-
-    def setup_connector(self):
-        """
-        Initial setup of the Trello connector.
-        Defines specific variables and additional settings required for the proper functioning of the connector.
-        """
-        log.info(f"Setting up Trello Connector with name: {self.name}")
-        if not self.api_key or not self.token:
-            log.error("Trello API key or token is not provided.")
-            raise ValueError("Trello API key and token must be provided for TrelloConnector.")
-        self.pre_connect_hook()
+        super().__init__(
+            name=name,
+            description=description or "Connector for Trello integration",
+            retry_attempts=retry_attempts,
+            timeout=timeout,
+            enable_retry=enable_retry
+        )
+        self.api_key = api_key or os.getenv('TRELLO_API_KEY')
+        self.api_token = api_token or os.getenv('TRELLO_API_TOKEN')
+        self.board_id = board_id or os.getenv('TRELLO_BOARD_ID')
+        self.base_url = "https://api.trello.com/1"
+        self.headers = {
+            "Accept": "application/json"
+        }
 
     def connect(self, **kwargs) -> None:
-        """
-        Establishes a connection to the Trello API using provided credentials.
+        """Establishes connection with Trello API."""
+        try:
+            self.pre_connect_hook(kwargs)
+            self.validate_parameters(kwargs)
+            self._load_credentials()
+            self._validate_credentials()
 
-        :param kwargs: Additional parameters required for connection.
-        :raises ConnectionError: If unable to connect to Trello API.
-        """
-        log.info(f"Connecting to Trello API with name: {self.name}")
-        # Attempt to connect by hitting a basic Trello API endpoint to verify credentials
-        response = requests.get(f"{self.base_url}members/me", params={"key": self.api_key, "token": self.token},
-                                timeout=self.timeout)
-        if response.status_code == 200:
-            log.info("Successfully connected to Trello API.")
-            self.is_connected = True
-            self.post_connect_hook()
-        else:
-            log.error(f"Failed to connect to Trello API: {response.status_code} - {response.text}")
-            raise ConnectionError("Unable to connect to Trello API.")
+            if self.validate_connection():
+                self.connected = True
+                log.info("Successfully connected to Trello API")
+                self.post_connect_hook()
+            else:
+                raise ConnectionError("Failed to validate Trello connection")
+
+        except Exception as e:
+            self._handle_exception(e, "Failed to connect to Trello")
+            raise
 
     def disconnect(self) -> None:
-        """
-        Disconnects from the Trello API.
-        Sets the internal state to disconnected.
-        """
-        log.info(f"Disconnecting from Trello API with name: {self.name}")
-        self.is_connected = False
+        """Disconnects from Trello API."""
+        try:
+            log.info("Disconnecting from Trello API")
+            self.connected = False
+        except Exception as e:
+            self._handle_exception(e, "Error during Trello disconnection")
+            raise
 
     def validate_connection(self) -> bool:
-        """
-        Validates if the Trello connection is still active by checking the API credentials.
-
-        :return: Boolean indicating if the connection is valid.
-        """
-        log.info(f"Validating Trello connection with name: {self.name}")
+        """Validates the connection to Trello API."""
         try:
-            response = requests.get(f"{self.base_url}members/me", params={"key": self.api_key, "token": self.token},
-                                    timeout=self.timeout)
-            if response.status_code == 200:
-                log.info("Trello connection is valid.")
-                return True
-            else:
-                log.error(f"Trello connection validation failed: {response.status_code} - {response.text}")
+            if not self.api_key or not self.api_token or not self.board_id:
                 return False
-        except requests.RequestException as e:
-            log.error(f"An error occurred while validating Trello connection: {e}")
+            url = f"{self.base_url}/boards/{self.board_id}"
+            response = requests.get(url, params=self._auth_params(), headers=self.headers, timeout=self.timeout)
+            return response.status_code == 200
+        except Exception as e:
+            self._handle_exception(e, "Trello connection validation failed")
             return False
 
-    def get_boards(self):
-        """
-        Retrieves the list of boards accessible by the authenticated user.
+    def get_env_keys(self) -> List[str]:
+        """Returns required environment variable keys."""
+        return ['TRELLO_API_KEY', 'TRELLO_API_TOKEN', 'TRELLO_BOARD_ID']
 
-        :return: JSON response containing the list of boards.
-        :raises ConnectionError: If unable to retrieve boards from Trello API.
-        """
-        log.info(f"Retrieving boards for Trello Connector with name: {self.name}")
-        response = requests.get(f"{self.base_url}members/me/boards", params={"key": self.api_key, "token": self.token},
-                                timeout=self.timeout)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            log.error(f"Failed to get boards: {response.status_code} - {response.text}")
-            raise ConnectionError("Unable to retrieve boards.")
+    def create_card(self, list_id: str, card_name: str, card_desc: Optional[str] = None) -> bool:
+        """Creates a new card in the specified Trello list."""
+        if not self.connected:
+            raise ConnectionError("Not connected to Trello API")
 
-    def create_card(self, list_id, card_name, card_desc=""):
-        """
-        Creates a new card in the specified Trello list.
+        try:
+            url = f"{self.base_url}/cards"
+            payload = {
+                "idList": list_id,
+                "name": card_name,
+                "desc": card_desc or "",
+                "key": self.api_key,
+                "token": self.api_token
+            }
+            response = requests.post(url, params=payload, headers=self.headers, timeout=self.timeout)
+            response.raise_for_status()
+            log.info(f"Successfully created card in Trello list: {list_id}")
+            return True
+        except Exception as e:
+            self._handle_exception(e, "Failed to create card in Trello")
+            return False
 
-        :param list_id: The ID of the Trello list where the card will be created.
-        :param card_name: The name of the card to be created.
-        :param card_desc: The description of the card to be created (optional).
-        :return: JSON response containing the details of the created card.
-        :raises ConnectionError: If unable to create card in Trello.
-        """
-        log.info(f"Creating card in list {list_id} for Trello Connector with name: {self.name}")
-        data = {
-            "name": card_name,
-            "desc": card_desc,
-            "idList": list_id,
+    def get_cards(self, list_id: str) -> List[Dict[str, Any]]:
+        """Gets all cards from a specified Trello list."""
+        if not self.connected:
+            raise ConnectionError("Not connected to Trello API")
+
+        try:
+            url = f"{self.base_url}/lists/{list_id}/cards"
+            response = requests.get(url, params=self._auth_params(), headers=self.headers, timeout=self.timeout)
+            response.raise_for_status()
+            cards = response.json()
+            log.info(f"Successfully retrieved cards from Trello list: {list_id}")
+            return cards
+        except Exception as e:
+            self._handle_exception(e, "Failed to retrieve cards from Trello")
+            return []
+
+    def _auth_params(self) -> Dict[str, str]:
+        """Returns authentication parameters for Trello API requests."""
+        return {
             "key": self.api_key,
-            "token": self.token
+            "token": self.api_token
         }
-        response = requests.post(f"{self.base_url}cards", json=data, timeout=self.timeout)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            log.error(f"Failed to create card: {response.status_code} - {response.text}")
-            raise ConnectionError("Unable to create card.")
 
-    def get_env_keys(self) -> list:
-        """
-        Provides the list of environment variable keys required for Trello connection.
-
-        :return: List of keys, such as ['TRELLO_API_KEY', 'TRELLO_TOKEN']
-        """
-        return ['TRELLO_API_KEY', 'TRELLO_TOKEN']
-
-    def pre_connect_hook(self, **kwargs):
-        """
-        Hook method to add any Trello-specific operations before connecting.
-        Can be overridden by subclasses to perform additional actions.
-
-        :param kwargs: Additional parameters for pre-connect setup.
-        """
-        log.info(f"Running pre-connect hook for Trello Connector with name: {self.name}")
-        # Add any pre-connect setup specific to Trello here
-        pass
-
-    def post_connect_hook(self):
-        """
-        Hook method to add any Trello-specific operations after connecting.
-        Can be overridden by subclasses to perform additional actions.
-        """
-        log.info(f"Running post-connect hook for Trello Connector with name: {self.name}")
-        # Add any post-connect actions specific to Trello here
-        pass
+    def notify(self, message: str = None) -> bool:
+        """Implementation of NotifiableConnector interface."""
+        try:
+            default_message = {"message": f"Notification from {self.name}"}
+            log.info(default_message if not message else message)
+            return True
+        except Exception as e:
+            log.error(f"Failed to send notification: {str(e)}")
+            return False

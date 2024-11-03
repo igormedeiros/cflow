@@ -1,0 +1,2 @@
+# Requirements for Mercado Livre Connector
+requests==2.28.1

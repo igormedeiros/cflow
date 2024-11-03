@@ -1,0 +1,3 @@
+
+# Requirements for Hotspot Connector
+requests==2.26.0

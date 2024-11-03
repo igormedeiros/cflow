@@ -1,0 +1,3 @@
+
+# Requirements for Redis Connector
+redis==4.3.3

@@ -1,0 +1,3 @@
+
+# Requirements for MongoDB Connector
+pymongo==4.3.3

@@ -1,53 +1,60 @@
 # File: src/tasks/excel_to_telegram_task.py
-from src.cflow.task_base import TaskBase
-from logger import log
+from cflow.task_protocol import TaskProtocol
+from cflow.logger import log
+from connectors.excel.excel_connector import ExcelConnector
+from connectors.telegram.telegram_connector import TelegramConnector
 
 
-class ExcelToTelegramTask(TaskBase):
-    def __init__(self, name="ExcelToTelegramTask", description=None, connectors=None, tools=None,
-                 retry_attempts: int = 3, backoff_factor: float = 1.5):
-        """
-        Initializes the Excel to Telegram Task.
-        :param name: Name of the task.
-        :param description: Optional description of the task.
-        :param connectors: Optional list of connectors to be used in the task.
-        :param tools: Optional list of tools to be used in the task.
-        :param retry_attempts: Number of retry attempts in case of failure.
-        :param backoff_factor: Factor to apply exponential backoff delay between retries.
+class ExcelToTelegramTask(TaskProtocol):
+    def __init__(self, name: str, description: str, connectors: list):
+        self.name = name
+        self.description = description
+        self.connectors = connectors
+        self.excel_connector = connectors[0]
+        self.telegram_connector = connectors[1]
 
-        Example:
-            connectors = [ExcelConnector(), TelegramConnector()]
-            task = ExcelToTelegramTask(connectors=connectors)
-        """
-        super().__init__(name, description if description else "Reads from Excel and sends data via Telegram",
-                         connectors, tools, retry_attempts, backoff_factor)
+    def validate(self) -> bool:
+        try:
+            if len(self.connectors) != 2:
+                log.error("Task requires exactly 2 connectors (Excel and Telegram)")
+                return False
+
+            if not isinstance(self.excel_connector, ExcelConnector):
+                log.error("First connector must be ExcelConnector")
+                return False
+
+            if not isinstance(self.telegram_connector, TelegramConnector):
+                log.error("Second connector must be TelegramConnector")
+                return False
+
+            return True
+        except Exception as e:
+            log.error(f"Task validation failed: {str(e)}")
+            return False
+
+    def pre_execute_hook(self) -> None:
+        log.info(f"Starting task: {self.name}")
+        for connector in self.connectors:
+            if not connector.connected:
+                connector.connect()
 
     def execute(self) -> None:
-        """
-        Execute the task by reading data from Excel and sending it via Telegram.
+        try:
+            # Lê dados do Excel
+            excel_data = self.excel_connector.get_data()
+            if excel_data.empty:
+                raise ValueError("No data received from Excel")
 
-        Example:
-            task.execute()
-        """
-        log.info(f"Starting execution of {self.name}")
-        self.state = "starting"
-        if not self.validate():
-            log.error(f"Task validation failed for: {self.name}")
-            return
+            # Envia para o Telegram
+            success = self.telegram_connector.send_data(excel_data)
+            if not success:
+                raise RuntimeError("Failed to send data to Telegram")
 
-        attempt = 0
-        while attempt < self.retry_attempts:
-            try:
-                self.state = "running"
-                log.info(f"Task {self.name} is running. (Attempt {attempt + 1}/{self.retry_attempts})")
-                self.pre_execute_hook()
-                self._read_from_excel_and_send_to_telegram()
-                self.post_execute_hook()
-                self.state = "completed"
-                log.info(f"Task {self.name} completed successfully.")
-                break
-            except Exception as e:
-                attempt += 1
-                self.state = "retrying"
-                log.error(
-                    f"An error occurred while executing {self.name} (Attempt {attempt}/{self.retry_attempts}): {e}")
+            log.info("Successfully processed and sent Excel data to Telegram")
+
+        except Exception as e:
+            log.error(f"Task execution failed: {str(e)}")
+            raise
+
+    def post_execute_hook(self) -> None:
+        log.info(f"Completed task: {self.name}")

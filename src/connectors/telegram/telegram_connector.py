@@ -1,128 +1,130 @@
-# Arquivo: src/connectors/telegram_connector/telegram_connector.py
-
-from src.cflow.connector_base import ConnectorBase
-import requests
-from logger import log
 import os
+from typing import Optional, List, Any
+
+from cflow.connector_base import ConnectorBase, NotifiableConnector
+from cflow.logger import log
 
 
-class TelegramConnector(ConnectorBase):
-    def __init__(self, name="TelegramConnector", description=None, token=None, chat_id=None, retry_attempts=3,
-                 timeout=30, enable_retry=True):
+class TelegramConnector(ConnectorBase, NotifiableConnector):
+    def __init__(
+            self,
+            name: str = "TelegramConnector",
+            description: Optional[str] = None,
+            token: Optional[str] = None,
+            chat_id: Optional[str] = None,
+            retry_attempts: int = 3,
+            timeout: int = 30,
+            enable_retry: bool = True,
+            parse_mode: Optional[str] = None
+    ):
         """
-        Initializes the TelegramConnector instance with specific parameters.
-
-        :param name: Name of the connector.
-        :param description: Optional description of the connector.
-        :param token: Telegram Bot token for authentication.
-        :param chat_id: The chat ID where messages will be sent.
-        :param retry_attempts: Number of times to retry the connection in case of failure.
-        :param timeout: Timeout value for the connection.
-        :param enable_retry: Flag to enable or disable retry attempts.
+        Initializes the TelegramConnector instance.
         """
-        super().__init__(name, description if description else "Sends notifications via Telegram", retry_attempts,
-                         timeout, enable_retry)
+        super().__init__(
+            name=name,
+            description=description or "Telegram Connector for sending messages",
+            retry_attempts=retry_attempts,
+            timeout=timeout,
+            enable_retry=enable_retry
+        )
         self.token = token or os.getenv('TELEGRAM_BOT_TOKEN')
         self.chat_id = chat_id or os.getenv('TELEGRAM_CHAT_ID')
-        self.base_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
-        self.setup_connector()
-
-    def setup_connector(self):
-        """
-        Initial setup of the Telegram connector.
-        Defines specific variables and additional settings required for the proper functioning of the connector.
-        """
-        log.info(f"Setting up Telegram Connector with name: {self.name}")
-        if not self.token or not self.chat_id:
-            log.error("Telegram token or chat ID is not provided.")
-            raise ValueError("Telegram token and chat ID must be provided for TelegramConnector.")
+        self.parse_mode = parse_mode
+        self.base_url = f"https://api.telegram.org/bot{self.token}" if self.token else None
+        self._last_data = None
 
     def connect(self, **kwargs) -> None:
-        """
-        Establishes a connection to prepare for sending messages via Telegram.
+        """Establishes connection with Telegram API."""
+        try:
+            self.pre_connect_hook(kwargs)
+            self.validate_parameters(kwargs)
+            self._load_credentials()
+            self._validate_credentials()
 
-        :param kwargs: Additional parameters required for connection.
-        """
-        log.info(f"Ready to send Telegram notifications to chat ID: {self.chat_id}")
-        # No actual connection to establish; setting internal state to connected
-        self.is_connected = True
+            if self.validate_connection():
+                self.connected = True
+                log.info(f"Successfully connected to Telegram API for chat ID: {self.chat_id}")
+                self.post_connect_hook()
+            else:
+                raise ConnectionError("Failed to validate Telegram connection")
+
+        except Exception as e:
+            self._handle_exception(e, "Failed to connect to Telegram")
+            raise
 
     def disconnect(self) -> None:
-        """
-        Disconnects from Telegram.
-        Sets the internal state to disconnected.
-        """
-        log.info(f"Disconnecting from Telegram notifications for chat ID: {self.chat_id}")
-        self.is_connected = False
+        """Disconnects from Telegram API."""
+        try:
+            log.info(f"Disconnecting from Telegram for chat ID: {self.chat_id}")
+            self.connected = False
+            self.session.close()
+        except Exception as e:
+            self._handle_exception(e, "Error during Telegram disconnection")
+            raise
 
     def validate_connection(self) -> bool:
-        """
-        Validates if the Telegram connection is still valid by sending a test message.
-
-        :return: Boolean indicating if the connection is valid.
-        """
-        log.info(f"Validating Telegram connection for chat ID: {self.chat_id}")
+        """Validates the Telegram connection."""
         try:
-            response = self.notify(message="Validation message from Telegram Connector.")
-            if response.status_code == 200:
-                log.info("Telegram connection is valid.")
-                return True
-            else:
-                log.error(f"Telegram connection validation failed: {response.status_code} - {response.text}")
+            if not self.token or not self.chat_id:
                 return False
-        except requests.RequestException as e:
-            log.error(f"An error occurred while validating Telegram connection: {e}")
+
+            response = self.session.get(
+                f"{self.base_url}/getMe",
+                timeout=self.timeout
+            )
+            return response.status_code == 200
+        except Exception as e:
+            self._handle_exception(e, "Telegram connection validation failed")
             return False
 
-    def notify(self, message="Workflow completed successfully."):
-        """
-        Sends a notification message to the specified Telegram chat.
-
-        :param message: The text message to send.
-        :return: Response object from the Telegram API.
-        :raises ConnectionError: If the notification fails.
-        """
-        if not self.is_connected:
-            log.error("No active connection. Please connect first before sending a notification.")
-            raise ConnectionError("No active connection. Please connect first before sending a notification.")
-
-        payload = {
-            "chat_id": self.chat_id,
-            "text": message
-        }
-        try:
-            response = requests.post(self.base_url, json=payload, timeout=self.timeout)
-            log.info(f"Notification sent to Telegram - Status Code: {response.status_code}")
-            response.raise_for_status()
-            return response
-        except requests.RequestException as e:
-            log.error(f"Failed to send notification to Telegram: {e}")
-            raise ConnectionError(f"Failed to send notification to Telegram for chat ID: {self.chat_id}")
-
-    def get_env_keys(self) -> list:
-        """
-        Provides the list of environment variable keys required for Telegram connection.
-
-        :return: List of keys, such as ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']
-        """
+    def get_env_keys(self) -> List[str]:
+        """Returns required environment variable keys."""
         return ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID']
 
-    def pre_connect_hook(self, **kwargs):
-        """
-        Hook method to add any Telegram-specific operations before connecting.
-        Can be overridden by subclasses to perform additional actions.
+    def send_message(self, message: str) -> bool:
+        """Sends a message through Telegram."""
+        if not self.connected:
+            raise ConnectionError("Not connected to Telegram")
 
-        :param kwargs: Additional parameters for pre-connect setup.
-        """
-        log.info(f"Running pre-connect hook for Telegram Connector with name: {self.name}")
-        # Add any pre-connect setup specific to Telegram here
-        pass
+        try:
+            url = f"{self.base_url}/sendMessage"
+            payload = {
+                "chat_id": str(self.chat_id),
+                "text": message
+            }
 
-    def post_connect_hook(self):
-        """
-        Hook method to add any Telegram-specific operations after connecting.
-        Can be overridden by subclasses to perform additional actions.
-        """
-        log.info(f"Running post-connect hook for Telegram Connector with name: {self.name}")
-        # Add any post-connect actions specific to Telegram here
-        pass
+            if self.parse_mode:
+                payload["parse_mode"] = self.parse_mode
+
+            response = self.session.post(url, json=payload, timeout=self.timeout)
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            self._handle_exception(e, f"Failed to send Telegram message: {str(e)}")
+            return False
+
+    def process_data(self, data: Any) -> str:
+        """Processes data before sending to Telegram."""
+        if isinstance(data, dict):
+            return "\n".join([f"{k}: {v}" for k, v in data.items()])
+        elif isinstance(data, (list, tuple)):
+            return "\n".join(map(str, data))
+        return str(data)
+
+    def send_data(self, data: Any) -> bool:
+        """Processes and sends data through Telegram."""
+        try:
+            processed_message = self.process_data(data)
+            return self.send_message(processed_message)
+        except Exception as e:
+            self._handle_exception(e, "Error processing and sending data")
+            return False
+
+    def notify(self, message: str = None) -> bool:
+        """Implementation of NotifiableConnector interface."""
+        try:
+            default_message = f"Workflow notification from {self.name}"
+            return self.send_message(message or default_message)
+        except Exception as e:
+            log.error(f"Failed to send notification: {str(e)}")
+            return False

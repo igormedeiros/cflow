@@ -1,6 +1,6 @@
 # File: src/cflow/tool_template.py
 from cflow.tool_base import ToolBase
-from logger import log
+from cflow.logger import log
 
 class ExampleTool(ToolBase):
     def __init__(self, name: str = "ExampleTool", description: str = None, max_retries: int = 3, backoff_factor: float = 2.0):

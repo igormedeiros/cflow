@@ -1,6 +1,6 @@
 # CFlow - Task Automation Framework
 
-CFlow is a Python framework for workflow automation and integration between different tools and APIs, inspired by frameworks like Langchain. It allows developers to define custom data pipelines using modular connectors, tools, and tasks to orchestrate workflows.
+CFlow is a Python framework for workflow automation and integration between different tools and APIs, inspired by frameworks like crewai. It allows developers to define custom data pipelines using modular triggers, connectors, tools, and tasks to orchestrate workflows.
 
 ## Project Structure
 
@@ -17,6 +17,17 @@ CFlow is a Python framework for workflow automation and integration between diff
 - **Resilience**: Implementation of retry mechanisms (with exponential backoff) for connectors.
 - **Monitoring and Logging**: Detailed logging and monitoring of workflow metrics.
 - **Workflow States**: The workflow manages its own lifecycle, with states such as Ready, Running, Paused, Completed, and Failed.
+
+## Connectors
+
+CFlow comes with over 60 connectors for integration with different platforms, allowing users to create versatile workflows. Here are some of the most well-known connectors:
+
+1. **Kubernetes Connector**: Integrates with Kubernetes clusters to manage namespaces and pods.
+2. **Excel Connector**: Reads data from Excel files for further processing in workflows.
+3. **Telegram Connector**: Sends messages to Telegram chats for notification purposes.
+4. **REST API Connector**: Generic connector for making HTTP requests to external REST APIs.
+5. **Slack Connector**: Integrates with Slack to send messages to channels or users.
+6. **Twilio Connector**: Enables sending SMS messages via the Twilio API.
 
 ## Requirements
 

@@ -1,9 +1,16 @@
 class ConnectorConfig:
-    CONNECTING_MESSAGE = "Connecting using: {}"
-    DISCONNECTING_MESSAGE = "Disconnecting: {}"
-    VALIDATING_CONNECTION_MESSAGE = "Validating connection for: {}"
+    """Global configurations for connectors."""
+
+    # Default messages
+    CONNECTING_MESSAGE = "Connecting to {} ..."
+    DISCONNECTING_MESSAGE = "Disconnecting from {} ..."
+    VALIDATING_CONNECTION_MESSAGE = "Validating connection for {} ..."
+    RETRY_ATTEMPT_MESSAGE = "Attempt {} of connection for {}"
     NO_DESCRIPTION_PROVIDED = "No description provided"
-    RETRY_ATTEMPT_MESSAGE = "Attempt {} to connect using: {}"
-    SUCCESSFUL_CONNECTION_MESSAGE = "Successfully connected using: {}"
-    CONNECTION_FAILED_MESSAGE = "Connection attempt {} failed: {}"
-    ALL_ATTEMPTS_FAILED_MESSAGE = "All {} connection attempts failed for: {}"
+
+    # Default timeouts (in seconds)
+    DEFAULT_TIMEOUT = 30
+    DEFAULT_RETRY_ATTEMPTS = 3
+
+    # Flags
+    ENABLE_RETRY_DEFAULT = True

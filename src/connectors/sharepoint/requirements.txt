@@ -1,0 +1,3 @@
+
+# Requirements for Microsoft SharePoint Connector
+requests==2.26.0

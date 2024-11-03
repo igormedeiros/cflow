@@ -1,0 +1,2 @@
+# Requirements for Microsoft Teams Connector
+requests==2.28.1

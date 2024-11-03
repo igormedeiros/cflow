@@ -2,7 +2,7 @@
 import time
 from enum import Enum
 from pydantic import BaseModel, ValidationError
-from logger import log
+from cflow.logger import log
 from cflow.tool_protocol import ToolProtocol
 
 class ToolState(Enum):

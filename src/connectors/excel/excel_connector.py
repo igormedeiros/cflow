@@ -1,8 +1,9 @@
 # Arquivo: src/connectors/excel_connector/excel_connector.py
 
-from src.cflow.connector_base import ConnectorBase
 import pandas as pd
-from logger import log
+
+from cflow.connector_base import ConnectorBase
+from cflow.logger import log
 
 
 class ExcelConnector(ConnectorBase):

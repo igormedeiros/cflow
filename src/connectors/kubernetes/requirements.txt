@@ -1,0 +1,2 @@
+# Requirements for Kubernetes Connector
+kubernetes==21.7.0

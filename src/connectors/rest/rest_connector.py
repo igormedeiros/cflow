@@ -1,8 +1,8 @@
 # Arquivo: src/connectors/rest_connector/rest_connector.py
 
-from src.cflow.connector_base import ConnectorBase
+from cflow.connector_base import ConnectorBase
 import requests
-from logger import log
+from cflow.logger import log
 
 
 class RestConnector(ConnectorBase):

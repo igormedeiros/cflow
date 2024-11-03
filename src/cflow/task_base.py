@@ -1,6 +1,6 @@
 # File: src/cflow/task_base.py
-from src.cflow.task_protocol import TaskProtocol
-from logger import log
+from cflow.task_protocol import TaskProtocol
+from cflow.logger import log
 import time
 import random
 

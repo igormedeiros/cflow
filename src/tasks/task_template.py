@@ -1,6 +1,6 @@
 # File: src/tasks/task_template.py
-from src.cflow.task_base import TaskBase
-from logger import log
+from cflow.task_base import TaskBase
+from cflow.logger import log
 
 class TaskTemplate(TaskBase):
     def __init__(self, name="TaskTemplate", description=None, connectors=None, tools=None, retry_attempts: int = 3):

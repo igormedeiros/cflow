@@ -1,0 +1,2 @@
+# Requirements for Anthropic Connector
+requests==2.28.1

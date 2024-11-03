@@ -1,0 +1,3 @@
+
+# Requirements for Power BI Connector
+requests==2.26.0

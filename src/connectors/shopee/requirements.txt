@@ -1,0 +1,2 @@
+# Requirements for Shopee Connector
+requests==2.28.1

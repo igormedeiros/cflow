@@ -2,7 +2,7 @@
 from typing import List, Optional
 import time
 from enum import Enum
-from logger import log
+from cflow.logger import log
 from cflow.connector_base import ConnectorBase, NotifiableConnector
 from cflow.task_base import TaskBase
 from cflow.tool_base import ToolBase
@@ -76,7 +76,7 @@ class Workflow:
         Connect all connectors after validating their configuration.
         """
         for connector in self.connectors:
-            if not connector.validate():
+            if not connector.validate_connection():
                 log.error(f"Connector '{connector.name}' validation failed. Skipping connection.")
                 continue
         for connector in self.connectors:
