@@ -2,11 +2,11 @@ import os
 
 from dotenv import load_dotenv
 
-from cflow.logger import log
-from cflow.workflow import Workflow
-from connectors.excel.excel_connector import ExcelConnector
-from connectors.telegram.telegram_connector import TelegramConnector
-from tasks.excel_to_telegram_task import ExcelToTelegramTask
+from core.logger import log
+from core.flux.flux import Flux
+from compenents.connectors.excel.excel_connector import ExcelConnector
+from compenents.connectors.telegram.telegram_connector import TelegramConnector
+from compenents.tasks.excel_to_telegram_task import ExcelToTelegramTask
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
         )
 
         # Criando o workflow
-        workflow = Workflow(
+        flux = Flux(
             name="Excel to Telegram Workflow",
             description="Workflow for processing Excel data and sending via Telegram",
             connectors=[excel_connector, telegram_connector],
@@ -51,7 +51,7 @@ def main():
         )
 
         # Executando o workflow
-        workflow.run()
+        flux.run()
         log.info("Workflow executed successfully")
 
     except Exception as e:

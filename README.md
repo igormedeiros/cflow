@@ -40,7 +40,7 @@ Clone this repository and install the dependencies using `pip`:
 
 ```bash
 $ git clone https://github.com/igormedeiros/cflow
-$ cd cflow
+$ cd core
 $ pip install -r requirements.txt
 ```
 
@@ -62,14 +62,16 @@ $ python main.py
 ### Workflow Example
 
 ```python
-from cflow.workflow import Workflow
-from connectors.excel.excel_connector import ExcelConnector
-from connectors.telegram.telegram_connector import TelegramConnector
-from tasks.excel_to_telegram_task import ExcelToTelegramTask
+from core.flux.flux import Flux
+from compenents.connectors.excel.excel_connector import ExcelConnector
+from compenents.connectors.telegram.telegram_connector import TelegramConnector
+from compenents.tasks.excel_to_telegram_task import ExcelToTelegramTask
+
 
 def main():
     excel_connector = ExcelConnector(name="Excel Connector", file_path="data.xlsx")
-    telegram_connector = TelegramConnector(name="Telegram Notifier", token="your_telegram_bot_token", chat_id="your_chat_id")
+    telegram_connector = TelegramConnector(name="Telegram Notifier", token="your_telegram_bot_token",
+                                           chat_id="your_chat_id")
 
     excel_to_telegram_task = ExcelToTelegramTask(
         name="Excel to Telegram Task",
@@ -77,7 +79,7 @@ def main():
         connectors=[excel_connector, telegram_connector]
     )
 
-    workflow = Workflow(
+    workflow = Flux(
         name="Sample Workflow",
         description="This workflow reads data from an Excel file and sends it to a Telegram chat",
         connectors=[excel_connector, telegram_connector],
@@ -85,6 +87,7 @@ def main():
     )
 
     workflow.run()
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
-from connectors.telegram.telegram_connector import TelegramConnector
-from cflow.logger import log
+from compenents.connectors.telegram.telegram_connector import TelegramConnector
+from core.logger import log
 
 
 def test_telegram():

@@ -2,12 +2,12 @@
 import os
 
 from dotenv import load_dotenv
-from cflow.logger import log
-from cflow.workflow import Workflow
-from connectors.excel.excel_connector import ExcelConnector
-from connectors.telegram.telegram_connector import TelegramConnector
-from tasks.excel_to_telegram_task import ExcelToTelegramTask
-from listeners.webhook_listener import WebhookListener
+from core.logger import log
+from core.flux.flux import Flux
+from compenents.connectors.excel.excel_connector import ExcelConnector
+from compenents.connectors.telegram.telegram_connector import TelegramConnector
+from compenents.tasks.excel_to_telegram_task import ExcelToTelegramTask
+from compenents.listeners.webhook_listener import WebhookListener
 
 def main():
     log.info("=== Initializing Workflow ===")
@@ -49,7 +49,7 @@ def main():
         )
 
         # Criando o workflow
-        workflow = Workflow(
+        workflow = Flux(
             name="Excel to Telegram Workflow",
             description="Workflow for processing Excel data and sending via Telegram",
             connectors=[excel_connector, telegram_connector],
