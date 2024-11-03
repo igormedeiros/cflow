@@ -6,6 +6,7 @@ from cflow.logger import log
 from cflow.connector_base import ConnectorBase, NotifiableConnector
 from cflow.task_base import TaskBase
 from cflow.tool_base import ToolBase
+from cflow.automation_listener_base import AutomationListener
 
 
 class WorkflowState(Enum):
@@ -22,21 +23,24 @@ class Workflow:
                  description: Optional[str] = None,
                  tools: Optional[List[ToolBase]] = None,
                  connectors: Optional[List[ConnectorBase]] = None,
-                 tasks: Optional[List[TaskBase]] = None):
+                 tasks: Optional[List[TaskBase]] = None,
+                 listeners: Optional[List[AutomationListener]] = None):
         """
-        Initializes a Workflow instance with the given name, description, tools, connectors, and tasks.
+        Initializes a Workflow instance with the given name, description, tools, connectors, tasks, and listeners.
 
         :param name: Name of the workflow.
         :param description: Optional description of the workflow.
         :param tools: List of tools to be used in the workflow.
         :param connectors: List of connectors to be used in the workflow.
         :param tasks: List of tasks to be executed as part of the workflow.
+        :param listeners: List of listeners that trigger the workflow automatically.
         """
         self.name = name
         self.description = description if description else "No description provided."
         self.tasks: List[TaskBase] = tasks if tasks else []
         self.connectors: List[ConnectorBase] = connectors if connectors else []
         self.tools: List[ToolBase] = tools if tools else []
+        self.listeners: List[AutomationListener] = listeners if listeners else []
         self.state = WorkflowState.READY
         self.metrics = {
             "total_execution_time": 0,
@@ -71,6 +75,15 @@ class Workflow:
         self.tools.append(tool)
         log.info(f"Tool added: {tool.name}")
 
+    def add_listener(self, listener: AutomationListener):
+        """
+        Adds a listener to the workflow.
+
+        :param listener: The listener to be added.
+        """
+        self.listeners.append(listener)
+        log.info(f"Listener added: {listener.__class__.__name__}")
+
     def _connect_connectors(self):
         """
         Connect all connectors after validating their configuration.
@@ -99,16 +112,29 @@ class Workflow:
             if isinstance(connector, NotifiableConnector):
                 connector.notify()
 
+    def listen(self):
+        """
+        Starts all listeners to wait for trigger events.
+        """
+        if not self.listeners:
+            log.info(f"No listeners found for workflow '{self.name}'. Defaulting to manual execution.")
+            self.run()
+        else:
+            log.info(f"Starting listeners for workflow '{self.name}'...")
+            for listener in self.listeners:
+                listener.start()
+                log.info(f"Listener '{listener.name}' started for workflow '{self.name}'.")
+
     def run(self, callback=None, tool_params: Optional[dict] = None):
         """
         Runs the workflow by connecting to all connectors, executing all tasks, and utilizing all tools.
         Enhanced error handling to differentiate between different error scenarios.
         """
-        try:
-            self.state = WorkflowState.RUNNING
-            log.info(f"Workflow '{self.name}' state updated to: {self.state.value}")
-            start_time = time.time()
+        self.state = WorkflowState.RUNNING
+        log.info(f"Workflow '{self.name}' state updated to: {self.state.value}")
+        start_time = time.time()
 
+        try:
             # Connect all connectors with validation
             try:
                 self._connect_connectors()
@@ -168,6 +194,11 @@ class Workflow:
             self.state = WorkflowState.FAILED
             log.error(f"Workflow '{self.name}' state updated to: {self.state.value} due to error: {e}")
 
+    def stop_listeners(self):
+        for listener in self.listeners:
+            listener.stop()
+            log.info(f"Listener for workflow '{self.name}' stopped.")
+
     def get_metrics(self):
         """
         Get the metrics of the workflow execution.
@@ -186,14 +217,4 @@ class Workflow:
 #
 # workflow = Workflow(name="SampleWorkflow", description="A workflow that demonstrates connectors, tasks, and tools")
 #
-# telegram_connector = TelegramConnector(name="Telegram Connector", token="YOUR_TOKEN", chat_id="YOUR_CHAT_ID")
-# workflow.add_connector(telegram_connector)
-#
-# excel_task = ExcelToTelegramTask(name="Excel to Telegram Task", file_path="/path/to/excel.xlsx", connector=telegram_connector)
-# workflow.add_task(excel_task)
-#
-# example_tool = ExampleTool(name="Sample Tool")
-# workflow.add_tool(example_tool)
-#
-# workflow.run()
-# --------------------------------------------------------
+# telegram_connector = TelegramConnector(name="Telegram Connector", token="YOUR_TOKEN", chat
