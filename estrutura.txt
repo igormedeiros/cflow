@@ -1,0 +1,456 @@
+.
+├── LICENSE
+├── README.md
+├── data.xlsx
+├── docs
+│   ├── CNAME
+│   ├── api
+│   │   ├── connectors.md
+│   │   ├── core
+│   │   │   ├── connector_base.md
+│   │   │   ├── flux.md
+│   │   │   ├── listener_base.md
+│   │   │   ├── task_base.md
+│   │   │   └── tool_base.md
+│   │   ├── flux.md
+│   │   ├── tasks.md
+│   │   ├── tools.md
+│   │   └── utils.md
+│   ├── components
+│   │   ├── connectors
+│   │   │   ├── apis.md
+│   │   │   ├── databases.md
+│   │   │   ├── files.md
+│   │   │   ├── index.md
+│   │   │   ├── llms.md
+│   │   │   └── messaging.md
+│   │   ├── connectors.md
+│   │   ├── core
+│   │   │   ├── connector_base.md
+│   │   │   ├── flux.md
+│   │   │   ├── listener_base.md
+│   │   │   ├── task_base.md
+│   │   │   └── tool_base.md
+│   │   ├── flux.md
+│   │   ├── tasks.md
+│   │   └── tools.md
+│   ├── development
+│   ├── guide
+│   │   ├── examples.md
+│   │   ├── getting-started.md
+│   │   └── installation.md
+│   ├── index.md
+│   └── templates
+│       ├── connector.md
+│       ├── listener.md
+│       ├── task.md
+│       └── tool.md
+├── estrutura.txt
+├── logs
+│   ├── error.log
+│   └── info.log
+├── mkdocs.yml
+├── poetry.lock
+├── pyproject.toml
+├── setup.py
+├── site
+│   ├── 404.html
+│   ├── CNAME
+│   ├── api
+│   │   ├── connectors
+│   │   │   └── index.html
+│   │   ├── core
+│   │   │   ├── connector_base
+│   │   │   │   └── index.html
+│   │   │   ├── flux
+│   │   │   │   └── index.html
+│   │   │   ├── listener_base
+│   │   │   │   └── index.html
+│   │   │   ├── task_base
+│   │   │   │   └── index.html
+│   │   │   └── tool_base
+│   │   │       └── index.html
+│   │   ├── flux
+│   │   │   └── index.html
+│   │   ├── tasks
+│   │   │   └── index.html
+│   │   ├── tools
+│   │   │   └── index.html
+│   │   └── utils
+│   │       └── index.html
+│   ├── assets
+│   │   ├── _mkdocstrings.css
+│   │   ├── images
+│   │   │   └── favicon.png
+│   │   ├── javascripts
+│   │   │   ├── bundle.83f73b43.min.js
+│   │   │   ├── bundle.83f73b43.min.js.map
+│   │   │   ├── lunr
+│   │   │   │   ├── min
+│   │   │   │   │   ├── lunr.ar.min.js
+│   │   │   │   │   ├── lunr.da.min.js
+│   │   │   │   │   ├── lunr.de.min.js
+│   │   │   │   │   ├── lunr.du.min.js
+│   │   │   │   │   ├── lunr.el.min.js
+│   │   │   │   │   ├── lunr.es.min.js
+│   │   │   │   │   ├── lunr.fi.min.js
+│   │   │   │   │   ├── lunr.fr.min.js
+│   │   │   │   │   ├── lunr.he.min.js
+│   │   │   │   │   ├── lunr.hi.min.js
+│   │   │   │   │   ├── lunr.hu.min.js
+│   │   │   │   │   ├── lunr.hy.min.js
+│   │   │   │   │   ├── lunr.it.min.js
+│   │   │   │   │   ├── lunr.ja.min.js
+│   │   │   │   │   ├── lunr.jp.min.js
+│   │   │   │   │   ├── lunr.kn.min.js
+│   │   │   │   │   ├── lunr.ko.min.js
+│   │   │   │   │   ├── lunr.multi.min.js
+│   │   │   │   │   ├── lunr.nl.min.js
+│   │   │   │   │   ├── lunr.no.min.js
+│   │   │   │   │   ├── lunr.pt.min.js
+│   │   │   │   │   ├── lunr.ro.min.js
+│   │   │   │   │   ├── lunr.ru.min.js
+│   │   │   │   │   ├── lunr.sa.min.js
+│   │   │   │   │   ├── lunr.stemmer.support.min.js
+│   │   │   │   │   ├── lunr.sv.min.js
+│   │   │   │   │   ├── lunr.ta.min.js
+│   │   │   │   │   ├── lunr.te.min.js
+│   │   │   │   │   ├── lunr.th.min.js
+│   │   │   │   │   ├── lunr.tr.min.js
+│   │   │   │   │   ├── lunr.vi.min.js
+│   │   │   │   │   └── lunr.zh.min.js
+│   │   │   │   ├── tinyseg.js
+│   │   │   │   └── wordcut.js
+│   │   │   └── workers
+│   │   │       ├── search.6ce7567c.min.js
+│   │   │       └── search.6ce7567c.min.js.map
+│   │   └── stylesheets
+│   │       ├── main.0253249f.min.css
+│   │       ├── main.0253249f.min.css.map
+│   │       ├── palette.06af60db.min.css
+│   │       └── palette.06af60db.min.css.map
+│   ├── components
+│   │   ├── connectors
+│   │   │   ├── apis
+│   │   │   │   └── index.html
+│   │   │   ├── databases
+│   │   │   │   └── index.html
+│   │   │   ├── files
+│   │   │   │   └── index.html
+│   │   │   ├── index.html
+│   │   │   ├── llms
+│   │   │   │   └── index.html
+│   │   │   └── messaging
+│   │   │       └── index.html
+│   │   ├── core
+│   │   │   ├── connector_base
+│   │   │   │   └── index.html
+│   │   │   ├── flux
+│   │   │   │   └── index.html
+│   │   │   ├── listener_base
+│   │   │   │   └── index.html
+│   │   │   ├── task_base
+│   │   │   │   └── index.html
+│   │   │   └── tool_base
+│   │   │       └── index.html
+│   │   ├── flux
+│   │   │   └── index.html
+│   │   ├── tasks
+│   │   │   └── index.html
+│   │   └── tools
+│   │       └── index.html
+│   ├── guide
+│   │   ├── examples
+│   │   │   └── index.html
+│   │   ├── getting-started
+│   │   │   └── index.html
+│   │   └── installation
+│   │       └── index.html
+│   ├── index.html
+│   ├── search
+│   │   └── search_index.json
+│   ├── sitemap.xml
+│   └── sitemap.xml.gz
+├── src
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── config.cpython-310.pyc
+│   │   └── config.cpython-311.pyc
+│   ├── components
+│   │   ├── connectors
+│   │   │   ├── __pycache__
+│   │   │   ├── anthropic
+│   │   │   │   ├── anthropic_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── azure_devops
+│   │   │   │   ├── azure_devops_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── correios_cep
+│   │   │   │   ├── correios_cep_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── csv_file
+│   │   │   │   └── csv_file_connector.py
+│   │   │   ├── eduzz
+│   │   │   │   ├── eduzz_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── excel
+│   │   │   │   ├── __pycache__
+│   │   │   │   │   └── excel_connector.cpython-311.pyc
+│   │   │   │   └── excel_connector.py
+│   │   │   ├── freshdesk
+│   │   │   │   ├── freshdesk_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── ftp
+│   │   │   │   ├── ftp_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── github
+│   │   │   │   ├── github_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── google_calendar
+│   │   │   │   ├── google_calendar_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── google_drive
+│   │   │   │   ├── google_drive_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── google_sheets
+│   │   │   │   ├── google_sheets_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── groq
+│   │   │   │   ├── groq_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── hotmart
+│   │   │   │   ├── hotmart_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── hotspot
+│   │   │   │   ├── hotspot_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── instagram
+│   │   │   │   ├── instagram_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── iot
+│   │   │   │   ├── iot_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── jira
+│   │   │   │   ├── jira_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── json_file
+│   │   │   │   ├── json_file_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── kafka
+│   │   │   │   ├── kafka_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── kiwify
+│   │   │   │   ├── kiwify_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── kubernetes
+│   │   │   │   ├── kubernetes_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── linkedin
+│   │   │   │   ├── linkedin_connector
+│   │   │   │   └── requirements.txt
+│   │   │   ├── mautic
+│   │   │   │   ├── mautic_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── mercadolivre
+│   │   │   │   ├── mercadolivre_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── microsoft_excel_online
+│   │   │   │   ├── microsoft_excel_online_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── microsoft_teams
+│   │   │   │   ├── microsoft_teams_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── mongodb
+│   │   │   │   ├── mongodb_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── mysql
+│   │   │   │   ├── mysql_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── n8n
+│   │   │   │   ├── n8n_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── netflix
+│   │   │   │   ├── netflix_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── notion
+│   │   │   │   ├── notion_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── openai
+│   │   │   │   ├── openai_llm_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── openweather
+│   │   │   │   ├── openweather_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── oracle
+│   │   │   │   ├── oracle_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── paypal
+│   │   │   │   ├── paypal_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── pipedrive
+│   │   │   │   ├── pipedrive_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── postgresql
+│   │   │   │   ├── postgresql_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── power_bi
+│   │   │   │   ├── power_bi_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── redis
+│   │   │   │   ├── redis_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── registrobr
+│   │   │   │   ├── registrobr_connector.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── rest
+│   │   │   │   └── rest_connector.py
+│   │   │   ├── rest_api
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── rest_api_connector.py
+│   │   │   ├── salesforce
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── salesforce_connector.py
+│   │   │   ├── sap
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── sap_connector.py
+│   │   │   ├── servicenow
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── servicenow_connector.py
+│   │   │   ├── sftp
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── sftp_connector.py
+│   │   │   ├── sharepoint
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── sharepoint_connector.py
+│   │   │   ├── shopee
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── shopee_connector.py
+│   │   │   ├── skype
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── skype_connector.py
+│   │   │   ├── slack
+│   │   │   │   ├── requirements.txt
+│   │   │   │   ├── requirements.txt~
+│   │   │   │   └── slack_connector.py
+│   │   │   ├── smtp
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── smtp_connector.py
+│   │   │   ├── ssh
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── ssh_connector.py
+│   │   │   ├── stripe
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── stripe_connector.py
+│   │   │   ├── sugarcrm
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── sugarcrm_connector.py
+│   │   │   ├── sympla
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── sympla_connector.py
+│   │   │   ├── telegram
+│   │   │   │   ├── __pycache__
+│   │   │   │   └── telegram_connector.py
+│   │   │   ├── trello
+│   │   │   │   ├── README.md
+│   │   │   │   ├── config.py
+│   │   │   │   ├── pyproject.toml
+│   │   │   │   ├── requirements.txt
+│   │   │   │   ├── setup.py
+│   │   │   │   ├── test_trello_connector.py
+│   │   │   │   └── trello_connector.py
+│   │   │   ├── twilio
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── twilio_connector.py
+│   │   │   ├── txt_file
+│   │   │   │   └── txt_file_connector.py
+│   │   │   ├── whatsapp_evolution
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── whatsapp_evolution_connector.py
+│   │   │   ├── whatsapp_twilio
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── whatsapp_twilio_connector.py
+│   │   │   ├── zendesk
+│   │   │   │   ├── requirements.txt
+│   │   │   │   └── zendesk_connector.py
+│   │   │   └── zoho
+│   │   │       └── zoho_desk_connector.py
+│   │   ├── listeners
+│   │   │   ├── google_drive_listener.py
+│   │   │   ├── linkedin_message_listener.py
+│   │   │   ├── local_folder_listener.py
+│   │   │   ├── mautic_contact_listener.py
+│   │   │   ├── telegram_message_listener.py
+│   │   │   ├── trello_card_listener.py
+│   │   │   └── webhook_listener.py
+│   │   ├── tasks
+│   │   │   ├── __pycache__
+│   │   │   │   └── excel_to_telegram_task.cpython-311.pyc
+│   │   │   ├── excel_to_rest_task.py
+│   │   │   ├── excel_to_telegram_task.py
+│   │   │   └── task_zohodesk_find_duplicate.py
+│   │   └── tools
+│   │       └── tool_template.py
+│   ├── config.py
+│   ├── core
+│   │   ├── __pycache__
+│   │   │   ├── config.cpython-311.pyc
+│   │   │   ├── logger.cpython-311.pyc
+│   │   │   └── utils.cpython-311.pyc
+│   │   ├── config.py
+│   │   ├── connector
+│   │   │   ├── __pycache__
+│   │   │   │   ├── connector_base.cpython-311.pyc
+│   │   │   │   └── connector_protocol.cpython-311.pyc
+│   │   │   ├── connector_base.py
+│   │   │   ├── connector_manager.py
+│   │   │   └── connector_protocol.py
+│   │   ├── flux
+│   │   │   ├── __pycache__
+│   │   │   │   └── flux.cpython-311.pyc
+│   │   │   └── flux.py
+│   │   ├── listener
+│   │   │   ├── __pycache__
+│   │   │   │   ├── listener_base.cpython-311.pyc
+│   │   │   │   └── listener_protocol.cpython-311.pyc
+│   │   │   ├── listener_base.py
+│   │   │   └── listener_protocol.py
+│   │   ├── logger.py
+│   │   ├── task
+│   │   │   ├── __pycache__
+│   │   │   │   ├── task_base.cpython-311.pyc
+│   │   │   │   └── task_protocol.cpython-311.pyc
+│   │   │   ├── task_base.py
+│   │   │   └── task_protocol.py
+│   │   ├── tool
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   ├── __init__.cpython-311.pyc
+│   │   │   │   ├── tool_base.cpython-311.pyc
+│   │   │   │   └── tool_protocol.cpython-311.pyc
+│   │   │   ├── tool.py
+│   │   │   ├── tool_base.py
+│   │   │   └── tool_protocol.py
+│   │   └── utils.py
+│   ├── poc_telegram.py
+│   ├── samples
+│   │   ├── main.py
+│   │   └── main_listener.py
+│   └── templates
+│       ├── connector_template.py
+│       ├── listener_template.py
+│       ├── task_template.py
+│       └── template_flux.py
+├── tests
+└── venv
+    ├── bin
+    │   ├── Activate.ps1
+    │   ├── activate.csh
+    │   ├── activate.fish
+    │   ├── pip
+    │   ├── python -> python3
+    │   ├── python3 -> /usr/bin/python3
+    │   └── python3.10 -> python3
+    ├── include
+    └── lib64 -> lib
+
+144 directories, 309 files
