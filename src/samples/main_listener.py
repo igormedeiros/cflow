@@ -1,13 +1,13 @@
+# File: main.py
 import os
 
 from dotenv import load_dotenv
-
 from core.logger import log
 from core.flux.flux import Flux
-from compenents.connectors.excel.excel_connector import ExcelConnector
-from compenents.connectors.telegram.telegram_connector import TelegramConnector
-from compenents.tasks.excel_to_telegram_task import ExcelToTelegramTask
-
+from components.connectors.excel.excel_connector import ExcelConnector
+from components.connectors.telegram.telegram_connector import TelegramConnector
+from components.tasks.excel_to_telegram_task import ExcelToTelegramTask
+from components.listeners.webhook_listener import WebhookListener
 
 def main():
     log.info("=== Initializing Workflow ===")
@@ -42,22 +42,28 @@ def main():
             connectors=[excel_connector, telegram_connector]
         )
 
-        # Criando o workflow
-        flux = Flux(
+        # Configurando o listener de webhook
+        webhook_listener = WebhookListener(
+            name="Webhook Listener",
+            url="https://your-webhook-url.com"
+        )
+
+        # Criando o Flux
+        workflow = Flux(
             name="Excel to Telegram Workflow",
             description="Workflow for processing Excel data and sending via Telegram",
             connectors=[excel_connector, telegram_connector],
-            tasks=[excel_to_telegram_task]
+            tasks=[excel_to_telegram_task],
+            listeners=[webhook_listener]
         )
 
-        # Executando o workflow
-        flux.run()
-        log.info("Workflow executed successfully")
+        # Executando o listener para iniciar o workflow quando acionado
+        workflow.listen()
+        log.info("Webhook Listener is now listening for incoming requests...")
 
     except Exception as e:
         log.error(f"Workflow execution failed: {str(e)}")
         raise
-
 
 if __name__ == "__main__":
     main()

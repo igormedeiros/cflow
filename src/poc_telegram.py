@@ -1,6 +1,8 @@
 import os
+
 from dotenv import load_dotenv
-from compenents.connectors.telegram.telegram_connector import TelegramConnector
+
+from components.connectors.telegram.telegram_connector import TelegramConnector
 from core.logger import log
 
 

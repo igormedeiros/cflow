@@ -1,12 +1,13 @@
 # File: src/tasks/excel_to_telegram_task.py
-from core.task.task_protocol import TaskProtocol
+from components.connectors.excel.excel_connector import ExcelConnector
+from components.connectors.telegram.telegram_connector import TelegramConnector
 from core.logger import log
-from compenents.connectors.excel.excel_connector import ExcelConnector
-from compenents.connectors.telegram.telegram_connector import TelegramConnector
+from core.task.task_base import TaskBase
 
 
-class ExcelToTelegramTask(TaskProtocol):
+class ExcelToTelegramTask(TaskBase):
     def __init__(self, name: str, description: str, connectors: list):
+        super().__init__(name, description, connectors)
         self.name = name
         self.description = description
         self.connectors = connectors

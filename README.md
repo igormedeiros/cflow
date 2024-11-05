@@ -7,7 +7,7 @@ Fluxr is a Python framework for workflow automation and integration between diff
 - **connectors/**: Contains connectors to connect to different data sources or APIs (e.g., Excel, REST, Telegram).
 - **tools/**: Reusable tools that provide unique and independent functionality (e.g., text conversion to uppercase).
 - **tasks/**: Contains tasks that combine connectors and tools to perform more complex operations.
-- **workflow.py**: Definition of the workflow that manages the execution of tasks and connectors.
+- **flux.py**: Definition of the workflow that manages the execution of tasks and connectors.
 - **main.py**: Example usage, demonstrating how to set up and run a workflow.
 
 ## Key Features
@@ -63,9 +63,9 @@ $ python main.py
 
 ```python
 from core.flux.flux import Flux
-from compenents.connectors.excel.excel_connector import ExcelConnector
-from compenents.connectors.telegram.telegram_connector import TelegramConnector
-from compenents.tasks.excel_to_telegram_task import ExcelToTelegramTask
+from components.connectors.excel.excel_connector import ExcelConnector
+from components.connectors.telegram.telegram_connector import TelegramConnector
+from components.tasks.excel_to_telegram_task import ExcelToTelegramTask
 
 
 def main():
