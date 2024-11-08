@@ -1,4 +1,4 @@
-# Fluxr - Task Automation Framework
+# Fluxr - Hyper Automation Framework
 
 Fluxr is a Python framework for workflow automation and integration between different tools and APIs, inspired by frameworks like crewai. It allows developers to define custom data pipelines using modular triggers, connectors, tools, and tasks to orchestrate workflows.
 
