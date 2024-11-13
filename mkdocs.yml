@@ -1,74 +1,41 @@
-site_name: Fluxr
-site_description: Task Automation Framework
-repo_url: https://github.com/igormedeiros/fluxr
-site_author: Igor Medeiros
-site_url: https://igormedeiros.com.br/fluxr
-
+site_name: Fluxr Documentation
 theme:
   name: material
-  language: pt-BR
+  palette:
+    primary: blue
+    accent: light blue
   features:
     - navigation.tabs
     - navigation.sections
     - navigation.expand
-    - search.highlight
-  palette:
-    - scheme: default
-      primary: teal
-      accent: cyan
-      toggle:
-        icon: material/brightness-7
-        name: Mudar para modo escuro
-    - scheme: slate
-      primary: teal
-      accent: cyan
-      toggle:
-        icon: material/brightness-4
-        name: Mudar para modo claro
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - Components:
+    - Tasks: components/tasks.md
+    - Connectors: components/connectors.md
+    - Tools: components/tools.md
+    - Triggers: components/triggers.md
+  - API Reference:
+    - Flux: api/flux.md
+    - Base Classes: api/base.md
+    - Connectors: api/connectors.md
+    - Tools: api/tools.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - admonition
+  - footnotes
 
 plugins:
   - search
   - mkdocstrings:
       handlers:
         python:
-          paths: [src]
-          options:
-            show_source: true
-            show_root_heading: true
-
-nav:
-  - Início: index.md
-  - Guia:
-    - Instalação: guide/installation.md
-    - Primeiros Passos: guide/getting-started.md
-    - Exemplos: guide/examples.md
-  - Componentes:
-    - Core:
-      - Flux: components/core/flux.md
-      - Connector Base: components/core/connector_base.md
-      - Task Base: components/core/task_base.md
-      - Tool Base: components/core/tool_base.md
-      - Listener Base: components/core/listener_base.md
-    - Conectores:
-      - Visão Geral: components/connectors/index.md
-      - APIs e Serviços: components/connectors/apis.md
-      - Banco de Dados: components/connectors/databases.md
-      - Arquivos: components/connectors/files.md
-      - Mensageria: components/connectors/messaging.md
-      - LLMs: components/connectors/llms.md
-    - Tasks: components/tasks.md
-    - Tools: components/tools.md
-    - Listeners: components/listeners.md
-  - API Reference:
-    - Core:
-      - Flux: api/core/flux.md
-      - Connector Base: api/core/connector_base.md
-      - Task Base: api/core/task_base.md
-      - Tool Base: api/core/tool_base.md
-      - Listener Base: api/core/listener_base.md
-    - Utils: api/utils.md
-  - Templates:
-    - Connector: templates/connector.md
-    - Task: templates/task.md
-    - Tool: templates/tool.md
-    - Listener: templates/listener.md
+          setup_commands:
+            - import sys
+            - sys.path.append("docs")

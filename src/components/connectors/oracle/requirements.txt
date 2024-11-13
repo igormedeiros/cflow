@@ -1,2 +1,0 @@
-# Requirements for Oracle Connector
-cx_Oracle==8.3.0

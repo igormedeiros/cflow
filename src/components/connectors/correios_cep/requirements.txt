@@ -1,3 +1,0 @@
-
-# Requirements for Correios CEP Connector
-requests==2.28.1

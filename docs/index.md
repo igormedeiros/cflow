@@ -1,51 +1,34 @@
-# Fluxr - Task Automation Framework
+# Welcome to Fluxr
 
-Fluxr é um framework Python para automação de workflow e integração entre diferentes ferramentas e APIs. Permite que desenvolvedores definam pipelines de dados personalizados usando triggers, conectores, ferramentas e tarefas modulares para orquestrar workflows.
+Fluxr is a powerful hyperautomation framework designed for building modular, scalable automation workflows. It provides a robust foundation for integrating AI agents, external services, and custom tools into your automation pipelines.
 
-## Estrutura do Projeto
+## Key Features
+
+- **Modular Architecture**: Build workflows using reusable components
+- **AI Integration**: Seamlessly incorporate AI agents into your automation
+- **External Connectors**: Connect to various services and data sources
+- **Real-time Feedback**: Get detailed execution insights and logging
+- **Event-driven**: Trigger workflows based on events
+- **Type Safety**: Built with Python type hints for better development experience
+
+## Example Usage
 
 ```python
-fluxr/
-├── connectors/    # Conectores para diferentes fontes de dados/APIs
-├── tools/         # Ferramentas reutilizáveis
-├── tasks/         # Tarefas que combinam conectores e ferramentas
-└── flux.py        # Definição do workflow
+from fluxr import Flux, Task, ExcelConnector, AgentTool, TelegramConnector
+
+# Configure task
+task = Task(
+    name="ExcelSummaryTask",
+    connectors=[ExcelConnector(), TelegramConnector()],
+    tools=[AgentTool(model="gpt-3.5-turbo", purpose="summarization")]
+)
+
+# Create and run workflow
+flux = Flux(verbose=True, log=True)
+flux.add_task(task)
+flux.run()
 ```
 
-## Recursos Principais
+## Getting Started
 
-Modularidade: Conectores, ferramentas e tarefas são componentes modulares que podem ser combinados
-Execution Hooks: Adicione comportamentos personalizados antes e depois das execuções
-Resiliência: Implementação de mecanismos de retry (com exponential backoff) para conectores
-Monitoramento e Logging: Logging detalhado e monitoramento de métricas do workflow
-Estados do Workflow: O workflow gerencia seu próprio ciclo de vida
-
-## Exemplo Rápido
-```python
-from fluxr.flux import Flux
-from fluxr.connectors.excel import ExcelConnector
-from fluxr.connectors.telegram import TelegramConnector
-from fluxr.tasks import ExcelToTelegramTask
-
-def main():
-    # Configurando conectores
-    excel = ExcelConnector(name="Excel", file_path="data.xlsx")
-    telegram = TelegramConnector(name="Telegram", token="BOT_TOKEN")
-
-    # Criando uma tarefa
-    task = ExcelToTelegramTask(
-        name="Excel to Telegram",
-        connectors=[excel, telegram]
-    )
-
-    # Configurando o workflow
-    workflow = Flux(
-        name="Data Pipeline",
-        connectors=[excel, telegram],
-        tasks=[task]
-    )
-
-    # Executando
-    workflow.run()
-```
-
+Check out our [Quick Start](getting-started/quickstart.md) guide to begin building your first Fluxr workflow.

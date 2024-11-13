@@ -1,24 +1,31 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "fluxr"
 version = "0.1.0"
-description = "Task Automation Framework"
-authors = ["Igor Medeiros <igor.medeiros@gmail.com>"]
+authors = [
+  { name = "Your Name", email = "your.email@example.com" },
+]
+description = "A modular hyperautomation framework inspired by CrewAI"
 readme = "README.md"
-packages = [
-    {include = "components", from = "src"},
-    {include = "core", from = "src"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "colorama>=0.4.6",
+    "pydantic>=2.0.0",
+    "loguru>=0.7.0",
+    "openai>=1.0.0",
+    "python-telegram-bot>=20.0",
+    "openpyxl>=3.1.0",
+    "asyncio>=3.4.3"
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-pandas = "^2.2.3"
-openpyxl = "^3.1.5"
-requests = "^2.32.3"
-python-dotenv = "^1.0.1"
-pydantic = "^2.9.2"
-numpy = "^2.1.3"
-flask = "^3.0.3"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[project.urls]
+"Homepage" = "https://github.com/yourusername/fluxr"
+"Bug Tracker" = "https://github.com/yourusername/fluxr/issues"

@@ -1,3 +1,0 @@
-
-# Requirements for SFTP Connector
-paramiko==2.11.0

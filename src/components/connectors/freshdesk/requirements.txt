@@ -1,3 +1,0 @@
-
-# Requirements for Freshdesk Connector
-requests==2.26.0

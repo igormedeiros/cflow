@@ -1,3 +1,0 @@
-
-# Requirements for Stripe Connector
-stripe==5.0.0

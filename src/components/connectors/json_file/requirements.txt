@@ -1,2 +1,0 @@
-# Requirements for JSON File Connector
-json5==0.9.8

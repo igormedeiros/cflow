@@ -1,3 +1,0 @@
-
-# Requirements for Zendesk Connector
-requests==2.28.1

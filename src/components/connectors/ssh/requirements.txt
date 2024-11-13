@@ -1,3 +1,0 @@
-
-# Requirements for SSH Connector
-paramiko==2.10.4

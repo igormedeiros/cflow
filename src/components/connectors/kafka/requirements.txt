@@ -1,2 +1,0 @@
-# Requirements for Kafka Connector
-kafka-python==2.0.2

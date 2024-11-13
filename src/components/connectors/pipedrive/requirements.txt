@@ -1,2 +1,0 @@
-# Requirements for Pipedrive Connector
-requests==2.28.1

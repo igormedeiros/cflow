@@ -104,6 +104,9 @@ settings_local.py
 config_local.py
 .local/
 
+# Bolt
+.bold
+
 # Docker
 .docker/
 docker-compose.override.yml

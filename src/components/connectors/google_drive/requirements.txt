@@ -1,5 +1,0 @@
-
-# Requirements for Google Drive Connector
-google-api-python-client==2.34.0
-google-auth==2.6.6
-google-auth-oauthlib==0.4.6

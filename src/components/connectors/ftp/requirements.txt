@@ -1,3 +1,0 @@
-
-# Requirements for FTP Connector
-ftplib
